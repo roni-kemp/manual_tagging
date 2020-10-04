@@ -88,8 +88,6 @@ def choose_dev_stage():
     cv2.imshow('image', img)
 
 
-
-
 def work_on_img(full_img_path):
 
     global img, origin_cache
@@ -131,14 +129,40 @@ def work_on_img(full_img_path):
                 break
 
     cv2.destroyAllWindows()
-    data_lst = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments}
-    return data_lst
-
+    img_data = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments}
+    return img_data
+#%%
 full_img_path = r"C:\Users\YasmineMnb\Desktop\SynologyDrive\proper_experiments\200831_contin_low\1_R\Croped_2\8053_CROPED.jpg"
 data_lst = work_on_img(full_img_path)
+#%% def loop_through_all_folders(start_indx):
+
+from pathlib import Path
+repo_dir = Path(".").absolute()
+imgs_dir = repo_dir/"first_last_imgs"
+
+exp_lst = os.listdir(imgs_dir)
+indx_lst = len(exp_lst)
+
+for indx in range(start_indx-1, len(exp_lst)):
+    curr_folder = exp_lst[indx]
+    curr_exp_folder_path = os.path.join(imgs_dir, exp_lst[indx])
+    print(curr_folder)
+    break
+    loop_through_single_exp(curr_exp_folder_path)
+
+
+def loop_through_single_exp(curr_exp_folder_path):
+    img_lst = os.listdir(curr_exp_folder_path)
+    for img in img_lst:
+        full_img_path = os.path.join(curr_exp_folder_path, img)
+        img_data = work_on_img(full_img_path)
+        with open("test_file.txt", "a") as out_file:
+            out_file.write(str(data_lst))
+            out_file.write("\n")
+        print("saved! :) moving on")
+
+
 #%%
-
-
 
 with open("test_file.txt", "a") as out_file:
     out_file.write(str(data_lst))
