@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-#%%
+#%
 
 def mous_interactions(event,x,y,flags,param):
     global img, origin_cache, points_lst
@@ -45,16 +45,16 @@ def draw_points(img, points_lst):
     for point in points_lst:
         cv2.circle(img, point, 1, (0, 5, 250), -1)
 
-def check_result():
+def check_result(text1 = "is this ok? (Enter / Esc)", text2 = "make your changes now pleas..."):
     global img, origin_cache
-    print("is this ok? (Enter / Esc)")
+    print(text1)
 
     while True:
         k=cv2.waitKey(1) & 0xFF
         if k==27: # Escape Key
             img = origin_cache.copy()
             cv2.line(img,tube_line[0],tube_line[1],(0,255,0),2)
-            print("ok, make your changes")
+            print(text2)
             return False
         elif k==13: # Enter Key
             return True
@@ -100,7 +100,6 @@ def work_on_img(full_img_path):
     global points_lst
     points_lst = []
 
-
     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
     while(1):
         cv2.setMouseCallback('image', mous_interactions)
@@ -111,55 +110,67 @@ def work_on_img(full_img_path):
 
         k=cv2.waitKey(1) & 0xFF
         if k==27: # Esc KEY
-            print("Exiting")
-            break
+            print("Exiting! you stoped...")
+            cv2.destroyAllWindows()
+            return "Break", k
+
         elif k==13: #Enter key
             for indx in range(1,len(points_lst)):
                 cv2.line(img, points_lst[indx], points_lst[indx-1], (0, 5, 250), 2)
             cv2.imshow('image', img)
             ok = check_result()
+            if not ok:
+                continue
             cot_stage = choose_dev_stage()
             ok = check_result()
-            if ok:
+            if not ok:
+                continue
+            elif ok:
                 print("ok!")
-                comments = input("any comments?")
+                ok = check_result(text1 = "any comments?", text2 = "you chose to add a comment.. if it was a mistake just click the comand window and press enter")
+                if not ok:
+                    comments = input("write comment now: ")
+                else: comments = ""
                 break
-            else:
-                comments = "missing data"
-                break
-
     cv2.destroyAllWindows()
     img_data = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments}
-    return img_data
+    return img_data, k
 #%%
 full_img_path = r"C:\Users\YasmineMnb\Desktop\SynologyDrive\proper_experiments\200831_contin_low\1_R\Croped_2\8053_CROPED.jpg"
 data_lst = work_on_img(full_img_path)
 #%% def loop_through_all_folders(start_indx):
+
+def loop_through_single_exp(curr_exp_folder_path):
+    img_lst = os.listdir(curr_exp_folder_path)
+    for img in img_lst:
+        full_img_path = os.path.join(curr_exp_folder_path, img)
+        print(img)
+        img_data, k = work_on_img(full_img_path)
+        if not k == 27: ## didn't press esc:
+            with open("TEST.txt", "a") as out_file:
+                out_file.write(str(img_data))
+                out_file.write("\n")
+            print("saved! :) moving on")
+        else:
+            return False
+    return True
 
 from pathlib import Path
 repo_dir = Path(".").absolute()
 imgs_dir = repo_dir/"first_last_imgs"
 
 exp_lst = os.listdir(imgs_dir)
-indx_lst = len(exp_lst)
+#indx_lst = len(exp_lst)
+
+start_indx = 49
 
 for indx in range(start_indx-1, len(exp_lst)):
     curr_folder = exp_lst[indx]
     curr_exp_folder_path = os.path.join(imgs_dir, exp_lst[indx])
     print(curr_folder)
-    break
-    loop_through_single_exp(curr_exp_folder_path)
-
-
-def loop_through_single_exp(curr_exp_folder_path):
-    img_lst = os.listdir(curr_exp_folder_path)
-    for img in img_lst:
-        full_img_path = os.path.join(curr_exp_folder_path, img)
-        img_data = work_on_img(full_img_path)
-        with open("test_file.txt", "a") as out_file:
-            out_file.write(str(data_lst))
-            out_file.write("\n")
-        print("saved! :) moving on")
+    stat = loop_through_single_exp(curr_exp_folder_path)
+    if not stat:
+        break
 
 
 #%%
