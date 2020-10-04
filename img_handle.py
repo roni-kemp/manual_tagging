@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+from pathlib import Path
 #%
 
 def mous_interactions(event,x,y,flags,param):
@@ -87,6 +88,17 @@ def choose_dev_stage():
     cv2.putText(img, cot_stage, pos, font, font_size,(90,255,30),font_thickness)
     cv2.imshow('image', img)
 
+def save_result_img(full_img_path, img):
+    repo_dir = Path(".").absolute()
+    results_folder = repo_dir/'result_imgs'
+    curr_result_folder = results_folder/full_img_path.split("\\")[-2]
+
+    if not os.path.isdir(curr_result_folder):
+        os.mkdir(curr_result_folder)
+
+    result_img_path = curr_result_folder / full_img_path.split("\\")[-1]
+    cv2.imwrite(result_img_path, img)
+    print("saved img")
 
 def work_on_img(full_img_path):
 
@@ -103,7 +115,6 @@ def work_on_img(full_img_path):
     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
     while(1):
         cv2.setMouseCallback('image', mous_interactions)
-
 
         draw_points(img, points_lst)
         cv2.imshow('image', img)
@@ -132,58 +143,66 @@ def work_on_img(full_img_path):
                     comments = input("write comment now: ")
                 else: comments = ""
                 break
+
     cv2.destroyAllWindows()
+    save_result_img(full_img_path, img)
+
     img_data = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments}
     return img_data, k
+
+
 #%%
-full_img_path = r"C:\Users\YasmineMnb\Desktop\SynologyDrive\proper_experiments\200831_contin_low\1_R\Croped_2\8053_CROPED.jpg"
-data_lst = work_on_img(full_img_path)
+#full_img_path = r"C:\Users\YasmineMnb\Desktop\SynologyDrive\proper_experiments\200831_contin_low\1_R\Croped_2\8053_CROPED.jpg"
+#data_lst = work_on_img(full_img_path)
 #%% def loop_through_all_folders(start_indx):
 
 def loop_through_single_exp(curr_exp_folder_path):
     img_lst = os.listdir(curr_exp_folder_path)
     for img in img_lst:
         full_img_path = os.path.join(curr_exp_folder_path, img)
-        print(img)
+        print("current image is: " + img)
         img_data, k = work_on_img(full_img_path)
         if not k == 27: ## didn't press esc:
             with open("TEST.txt", "a") as out_file:
                 out_file.write(str(img_data))
                 out_file.write("\n")
-            print("saved! :) moving on")
+            print("saved data! :) moving on\n")
         else:
             return False
     return True
 
-from pathlib import Path
-repo_dir = Path(".").absolute()
-imgs_dir = repo_dir/"first_last_imgs"
 
-exp_lst = os.listdir(imgs_dir)
-#indx_lst = len(exp_lst)
+def main():
 
-start_indx = 49
+    start_indx = 49
 
-for indx in range(start_indx-1, len(exp_lst)):
-    curr_folder = exp_lst[indx]
-    curr_exp_folder_path = os.path.join(imgs_dir, exp_lst[indx])
-    print(curr_folder)
-    stat = loop_through_single_exp(curr_exp_folder_path)
-    if not stat:
-        break
+    repo_dir = Path(".").absolute()
+    imgs_dir = repo_dir/"first_last_imgs"
+
+    exp_lst = os.listdir(imgs_dir)
+
+    for indx in range(start_indx-1, len(exp_lst)):
+        curr_folder = exp_lst[indx]
+        curr_exp_folder_path = os.path.join(imgs_dir, exp_lst[indx])
+
+        text = "current folder:\t" + curr_folder
+        text_len = len(text)
+        print("#"*text_len)
+        print(text+  "\nindx = " + str(indx-1))
+        print("#"*text_len)
+
+        status = loop_through_single_exp(curr_exp_folder_path)
+        if not status:
+            break
+if __name__ == "__main__":
+    main()
 
 
-#%%
-
-with open("test_file.txt", "a") as out_file:
-    out_file.write(str(data_lst))
-    out_file.write("\n")
-
-#%%
-with open("test_file.txt", "r") as in_file:
-    for line in in_file:
-        q = eval(line)
-        print(q)
+#%% for reading...
+#with open("test_file.txt", "r") as in_file:
+#    for line in in_file:
+#        q = eval(line)
+#        print(q)
 
 
 
