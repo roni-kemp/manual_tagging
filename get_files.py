@@ -5,10 +5,11 @@
 
 import os
 import re
+from tqdm import tqdm as tq
 #%%
 
 #%%
-prop_exp_folder =  r"C:\Users\YasmineMnb\Desktop\SynologyDrive\proper_experiments"
+prop_exp_folder =  r"D:\my original pictures\prop_exp_more_1"
 
 exp_folder_lst = str(os.listdir(prop_exp_folder))
 
@@ -16,7 +17,7 @@ regex = r"[0-9]{6}_contin[_]*[low]*"
 matches = re.finditer(regex, exp_folder_lst, re.MULTILINE)
 
 lst = []
-for match in matches:
+for match in tq(matches):
     per_exp_path = prop_exp_folder+"\\"+match.group()
     exp_date = match.group()
     lst.append(exp_date)
@@ -41,12 +42,12 @@ for match in matches:
                     filenames = os.listdir(per_location_path)
                     firs_img_path = os.path.join(per_location_path, filenames[0])
                     last_img_path = os.path.join(per_location_path, filenames[-1])
+#                    print(firs_img_path, last_img_path)
 
                     first_new_name = filenames[0].strip(".jpg") + loc + ".jpg"
                     first_new_path = os.path.join(new_folder, first_new_name)
                     last_new_name = filenames[-1].strip(".jpg") + loc + ".jpg"
                     last_new_path = os.path.join(new_folder, last_new_name)
-
 
                     os.system(r'copy "{in_path}" "{out_path}"'.format(in_path = firs_img_path, out_path = first_new_path))
                     os.system(r'copy "{in_path}" "{out_path}"'.format(in_path = last_img_path, out_path = last_new_path))

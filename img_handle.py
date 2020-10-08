@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 from pathlib import Path
+import time
 #%
 
 def mous_interactions(event,x,y,flags,param):
@@ -147,7 +148,7 @@ def work_on_img(full_img_path):
     cv2.destroyAllWindows()
     save_result_img(full_img_path, img)
 
-    img_data = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments}
+    img_data = {"full_img_path":full_img_path,"tube_line":tube_line,"points_lst":points_lst,"cot_stage":cot_stage,"comments":comments, "tag_time":round(time.time())}
     return img_data, k
 
 
