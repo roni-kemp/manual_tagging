@@ -98,7 +98,7 @@ def save_result_img(full_img_path, img):
         os.mkdir(curr_result_folder)
 
     result_img_path = curr_result_folder / full_img_path.split("\\")[-1]
-    cv2.imwrite(result_img_path, img)
+    cv2.imwrite(str(result_img_path), img)
     print("saved img")
 
 def work_on_img(full_img_path):
