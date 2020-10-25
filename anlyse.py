@@ -12,7 +12,6 @@ import time
 from scipy import signal
 import cv2
 #from tqdm import tqdm as tq
-#%%
 
 def load_data():
     data_lst = []
@@ -21,24 +20,19 @@ def load_data():
             q = eval(line)
             data_lst.append(q)
     return data_lst
-            #%%
-data_lst = load_data()
+
 def dist(st_point,end_point):
+    """ converts 2 points into numpy array and calculates the distance """
     st = np.array(st_point)
     end = np.array(end_point)
     return np.linalg.norm(st - end)
 
-#def dist(x1,y1,x2,y2):
-#    return ((x2-x1)**2 + (y2-y1)**2)**0.5
-
-#%%
 def get_size(img_data):
     """
     get a general idea of the size of the shoot.
     assuming:
       - the tube_line = 2cm
     """
-    #%%
     tube_line = img_data["tube_line"]
     st = tube_line[0]
     end = tube_line[1]
@@ -50,16 +44,38 @@ def get_size(img_data):
     conv_ratio = 2/tube_size_in_pixls             # (the size of a single pixl)
 
     length_in_pixl = sum_points(img_data)
-    length= length_in_pixl*conv_ratio
+    length = length_in_pixl * conv_ratio
     return length
 
 def sum_points(img_data):
+    """
+    should be replaced with get_s_lst[-1]   !!!
+    """
     sum_of_points_dst = 0
     points_lst = img_data["points_lst"]
     for i, point in enumerate(points_lst[:-1]):
         sum_of_points_dst += dist(point,points_lst[i+1])
     return sum_of_points_dst
-            #%%
+
+def get_s_lst(img_data):
+    ds_lst = []
+    points_lst = img_data["points_lst"]
+    for i, point in enumerate(points_lst[:-1]):
+        ds_lst.append(dist(point,points_lst[i+1]))
+    s_lst = np.cumsum(ds_lst)
+    return s_lst
+
+def get_theta_lst(img_data):
+    points_lst = img_data["points_lst"]
+    theta_lst = []
+    for i, point in enumerate(points_lst[:-1]):
+        rel_x = points_lst[i+1][0] - point[0]
+        rel_y = points_lst[i+1][1] - point[1]
+        theta = np.arccos(rel_x/np.sqrt(rel_y**2+rel_x**2))*180/np.pi
+        theta = round(theta,1)
+        theta_lst.append(theta)
+    return theta_lst
+
 def get_size_distribution(data_lst):
     sizes = []
     for img_data in data_lst:
@@ -73,6 +89,30 @@ def get_size_distribution(data_lst):
 #            img_show(img_data)
     return sizes
 
+
+def img_show(img_data):
+    res_path = r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\snflwrs zip to Roni\result_imgs"
+    o_img_path=img_data["full_img_path"]
+    new_img_path = res_path +"\\20"+ o_img_path.split("\\20")[-1]
+    img = cv2.imread(new_img_path)
+
+    ## add points
+    for point in img_data["points_lst"]:
+        cv2.circle(img, point,1,(255,0,0), -1)
+
+    while True:
+        cv2.namedWindow("image", cv2.WINDOW_NORMAL)
+        cv2.imshow('image', img)
+        k=cv2.waitKey(1) & 0xFF
+        if k==27: # Esc KEY
+            print("Exiting! you stoped...")
+            cv2.destroyAllWindows()
+            break
+    cv2.destroyAllWindows()
+
+data_lst = load_data()
+
+
 #%% boxplot
 
 
@@ -85,21 +125,7 @@ plt.title("size distribution")
 
 
 
-#%%
-def img_show(img_data):
-    res_path = r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\snflwrs zip to Roni\result_imgs"
-    o_img_path=img_data["full_img_path"]
-    new_img_path = res_path +"\\20"+ o_img_path.split("\\20")[-1]
 
-    img = cv2.imread(new_img_path)
-    while True:
-        cv2.imshow('image', img)
-        k=cv2.waitKey(1) & 0xFF
-        if k==27: # Esc KEY
-            print("Exiting! you stoped...")
-            cv2.destroyAllWindows()
-            break
-    cv2.destroyAllWindows()
 
     #%% fitting
 
