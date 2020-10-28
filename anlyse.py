@@ -187,7 +187,8 @@ plt.title("size distribution")
 #%%  histogram
 fig, ax1 = plt.subplots(nrows=1, ncols=1, sharex=True)
 
-plt.hist(sizes_first,15)
+plt.hist(sizes_first,15,)# alpha = 0.5)
+plt.hist(sizes_last,15, alpha = 0.5)
 plt.grid(True)
 plt.title("size distribution")
 
