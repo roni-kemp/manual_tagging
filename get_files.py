@@ -9,7 +9,7 @@ from tqdm import tqdm as tq
 #%%
 
 #%%
-prop_exp_folder =  r"D:\my original pictures\prop_exp_more_1"
+prop_exp_folder =  r"\\spock\roni\img_backup\proper_new\proper_experiments_low_light"
 
 exp_folder_lst = str(os.listdir(prop_exp_folder))
 
