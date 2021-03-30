@@ -4,3 +4,4 @@
 ## 2DO
  - [ ] tagger doesn't add cot_stage to the file (only writes it on img)
  - [ ] change save file! the dict is garbag
+ - [ ] when restarting program the file doesn't overwrite the last enrty...
