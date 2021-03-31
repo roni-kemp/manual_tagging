@@ -37,7 +37,7 @@ def detect_cotil_text(img, file_name = "test"):
 
 
 ## load in the data from the .txt file
-with open(r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\taged results\TEST.txt", "r") as tags_file:
+with open(r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\taged_results_High\everything.txt", "r") as tags_file:
     ## get the first line to init the dct for the data frame
     f_line = tags_file.readline()
     f_dct = literal_eval(f_line)
@@ -64,7 +64,7 @@ for i in range(len(df)):
 
 
 
-mother_dir = r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\taged results\result_imgs"
+mother_dir = r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\taged_results_High\result_imgs"
 
 dir_lst = os.listdir(mother_dir)
 for directory_name in dir_lst:
@@ -85,8 +85,25 @@ for directory_name in dir_lst:
         df.loc[ind]["cot_stage"]=state
 
 
+df.to_csv(r"C:\Users\YasmineMnb\Desktop\Roni_new\python scripts\manual_tagging\taged_results_High\results.csv")
+
 
         ## show the part of the img with the text
     #    ROI = img[0:22,18:76]
     #    cv2.namedWindow(file_name, cv2.WINDOW_NORMAL)
     #    cv2.imshow(file_name , ROI)
+    #%%
+#import time
+#
+#time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1602517302))
+#
+#
+#
+#df["diff"] = df["tag_time"].diff()
+#
+#summ = 0
+#
+#for dt in df["diff"][1:]:
+#    if dt>100:
+#        continue
+#    summ += dt
