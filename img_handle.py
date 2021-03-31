@@ -88,6 +88,8 @@ def choose_dev_stage():
     font_thickness = 1
     cv2.putText(img, cot_stage, pos, font, font_size,(90,255,30),font_thickness)
     cv2.imshow('image', img)
+    return cot_stage
+
 
 def save_result_img(full_img_path, img):
     repo_dir = Path(".").absolute()
@@ -164,14 +166,49 @@ def loop_through_single_exp(curr_exp_folder_path):
         print("current image is: " + img)
         img_data, k = work_on_img(full_img_path)
         if not k == 27: ## didn't press esc:
-            with open("TEST.txt", "a") as out_file:
+            with open("TEST1.txt", "a") as out_file:
                 out_file.write(str(img_data))
                 out_file.write("\n")
             print("saved data! :) moving on\n")
         else:
             return False
     return True
+#%%  needs testing and implemnting
+import pandas as pd
 
+data_dct = {"asd":"name2", "qwe":234, "lst":[1,23.3,4]}
+data_dct = {"asd":"name1", "qwe":4, "lst":[2,34]}
+file_path = r"test1.csv"
+def update_file(data_dct, file_path):
+    ## try to load the data from a file and make changes to it.
+    try:
+        # Load data
+        file_df = pd.read_csv(file_path, index_col = 0)
+        # Check first key (identifier) for duplicates
+        identifier_key = list(data_dct.keys())[0]
+        identifier_content = data_dct[identifier_key]
+        # If there is a duplicate overwrite it
+        if file_df[identifier_key].str.contains(identifier_content).any():
+            # Get the indx of the data on file to be overwritten
+            indx = file_df[file_df[identifier_key].str.contains(identifier_content)].index[0]
+            # Overwrite the values with said indx with the new - values
+            values = list( map(data_dct.get, list(data_dct.keys())) )
+            file_df.loc[indx, list(data_dct.keys())] = values
+        # If the data doesn't exist yet just append it
+        else:
+            file_df = file_df.append(data_dct, ignore_index=True)
+        # Save new df to file
+        file_df.to_csv(file_path)
+
+    ## if the file does not exist creat a new file (first line...)
+    except FileNotFoundError:
+        print("file not found, creating new file at: " + file_path)
+        df = pd.DataFrame(columns=data_dct.keys())
+        df = df.append(data_dct, ignore_index=True)
+        df.to_csv(file_path)
+
+
+#%%
 
 def main():
 
